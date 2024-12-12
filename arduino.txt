@@ -1,0 +1,28 @@
+#include <SoftwareSerial.h>
+
+SoftwareSerial gpsSerial(4, 3); // RX, TX for GPS module
+String latitude = "";
+String longitude = "";
+
+void setup() {
+  Serial.begin(9600); // For communication with Python backend
+  gpsSerial.begin(9600); // For communication with GPS module
+}
+
+void loop() {
+  if (gpsSerial.available()) {
+    String data = gpsSerial.readStringUntil('\n');
+    // Parse latitude and longitude from the GPS data
+    if (data.startsWith("$GPGGA")) { // Example NMEA sentence
+      latitude = "12.971598";  // Replace with parsed data
+      longitude = "77.594566"; // Replace with parsed data
+    }
+  }
+
+  if (Serial.available()) {
+    String command = Serial.readStringUntil('\n');
+    if (command == "GET_COORDINATES") {
+      Serial.println("LAT:" + latitude + ",LON:" + longitude);
+    }
+  }
+}
